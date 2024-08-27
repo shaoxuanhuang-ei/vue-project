@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>33333</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button type="button" id="btnPay">确认并⽀付</button>
+    <script>
+      // 获取画布和按钮元素
+      var canvas = document.getElementById('canvas')
+      var btnPay = document.getElementById('btnPay')
+      // 获取画布上下⽂和座位数组
+      var ctx = canvas.getContext('2d')
+      var seats = []
+      // 绘制座位
+      function drawSeat(x, y, state) {
+        switch (state) {
+          case 0:
+            ctx.fillStyle = '#ccc' // 可选座位
+            break
+          case 1:
+            ctx.fillStyle = '#f00' // 已售座位
+            break
+          case 2:
+            ctx.fillStyle = '#0f0' // 已选座位
+            break
+          default:
+            ctx.fillStyle = '#000' // 其他座位
+            break
+        }
+        ctx.fillRect(x, y, 30, 30)
+      }
+      // 初始化座位数组
+      function initSeat() {
+        for (let i = 0; i < 10; i++) {
+          seats[i] = []
+          for (let j = 0; j < 10; j++) {
+            seats[i][j] = 0 // 初始状态为可选
+            if (j == 4) {
+              seats[i][j] = 1
+            }
+            drawSeat(i * 40, j * 40, seats[i][j]) // 绘制座位
+          }
+        }
+      }
+      // 统计已选座位数量和位置
+      function countSelectedSeats() {
+        var selectedSeats = []
+        var count = 0
+        for (var i = 0; i < 10; i++) {
+          for (var j = 0; j < 10; j++) {
+            if (seats[i][j] == 2) {
+              selectedSeats.push([i, j])
+              count++
+            }
+          }
+        }
+        return [count, selectedSeats]
+      }
+      // 更新座位状态和颜⾊
+      function updateSeat(x, y) {
+        if (seats[x][y] == 0) {
+          seats[x][y] = 2 // 更改为已选状态
+        } else if (seats[x][y] == 2) {
+          seats[x][y] = 0 // 更改为可选状态
+        }
+        drawSeat(x * 40, y * 40, seats[x][y]) // 更新颜⾊
+      }
+      // 检查座位状态是否可选
+      function checkSeat(x, y) {
+        if (seats[x][y] == 1) {
+          alert('该座位已售出，请选择其他座位！')
+          return false
+        }
+        return true
+      }
+      // 点击事件处理函数
+      function handleClick(e) {
+        var x = parseInt((e.clientX - canvas.offsetLeft) / 40)
+        var y = parseInt((e.clientY - canvas.offsetTop) / 40)
+
+        if (x >= 0 && x < 10 && y >= 0 && y < 10) {
+          if (checkSeat(x, y)) {
+            updateSeat(x, y)
+            var count = countSelectedSeats()[0]
+            if (count > 0) {
+              btnPay.innerHTML = '确认并⽀付（已选 ' + count + ' 座位）'
+            } else {
+              btnPay.innerHTML = '确认并⽀付'
+            }
+          }
+        }
+      }
+      // 确认并⽀付按钮点击事件处理函数
+      function handlePay() {
+        var selectedSeats = countSelectedSeats()[1]
+        if (selectedSeats.length == 0) {
+          alert('请选择座位！')
+          return
+        }
+        if (confirm('您已选中以下座位：' + selectedSeats.join('、') + '，确认⽀付吗？')) {
+          // 向后台发送选票信息，并进⾏⽀付处理
+          alert('⽀付成功！请前往指定影院取票！')
+          initSeat() // 重新初始化座位
+          btnPay.innerHTML = '确认并⽀付'
+        }
+      }
+      // 初始化座位
+      initSeat()
+      // 绑定点击事件和确认并⽀付按钮点击事件
+      canvas.addEventListener('click', handleClick)
+      btnPay.addEventListener('click', handlePay)
+    </script>
+  </body>
+</html>
