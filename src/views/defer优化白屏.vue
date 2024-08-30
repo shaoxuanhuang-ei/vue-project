@@ -1,6 +1,8 @@
 <template>
   <!-- 动态组件时，到第n帧之后，才会渲染第n个组件 -->
-  <div v-if="userDefer(n)">111</div>
+  <div v-for="n in 100">
+    <div v-if="userDefer(n)">{{ n }}</div>
+  </div>
 </template>
 <script setup>
 import { ref } from 'vue'

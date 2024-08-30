@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const urls = []
+      const maxReqNum = 30
+      for (let i = 1; i <= 100; i++) {
+        urls.push(`https://jsonplaceholder.typicode.com/todos/${i}`)
+      }
+      function highRequest(urls, maxNum) {
+        return new Promise((resolve) => {
+          if (urls === null || urls === undefined || urls.length === 0) {
+            return resolve([])
+          }
+          let result = [],
+            requestCount = 0,
+            fulfillCount = 0
+          async function request() {
+            if (requestCount === urls.length) return
+            let index = requestCount
+            let url = urls[index]
+            requestCount++
+            try {
+              const res = await fecth(url)
+              result[index] = res
+            } catch (error) {
+              result[index] = error
+            } finally {
+              fulfillCount++
+              if (fulfillCount === urls.length) {
+                return resolve(result)
+              }
+              request()
+            }
+          }
+        })
+        const times = Math.min(urls.length, maxNum)
+        for (let i = 0; i <= times; i++) {
+          request()
+        }
+      }
+    </script>
+  </body>
+</html>
