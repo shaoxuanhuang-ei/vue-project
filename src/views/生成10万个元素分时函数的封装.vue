@@ -1,10 +1,12 @@
 <template>
   <button class="btn">生成10万个元素</button>
+  <button class="container">元素</button>
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
 onMounted(() => {
   const btn = document.querySelector('.btn')
+  const ul = document.querySelector('.container')
   const datas = Array.from({ length: 100000 }, (_, i) => i)
   // btn.onclick = () => {
   //   // 方案一：正常这么生成的话是会有一段时间的卡顿的，因为任务量太多，需要耗费一定的时间，会影响渲染
@@ -16,6 +18,9 @@ onMounted(() => {
   // }
 
   //方案二：requestIdleCallback
+  // 如果是使用 setTimeout 将渲染操作放入下一个事件循环会有个小问题：假设浏览器页面刷新时间为 16.7ms，如果v8引擎的性能不够高，进行完一次事件循环的时间比 16.7ms 要长，那么浏览器在 16.7ms 内渲染完了 20 条数据，而 v8引擎还没将下一个20条数据给出来，这样就很可能会造成页面的闪屏或卡顿。
+  // 要解决定时器带来的事件循环与屏幕刷新不同步的问题，并充分利用浏览器渲染帧的空余时间，使用requestIdleCallback
+
   // btn.onclick = () => {
   //   // 方案一：正常这么生成的话是会有一段时间的卡顿的，因为任务量太多，需要耗费一定的时间，会影响渲染
   //   // for (const i of datas) {
@@ -55,9 +60,13 @@ onMounted(() => {
   // }
   btn.onclick = () => {
     const taskHandler = (_, i) => {
+      let fragment = document.createDocumentFragment() //优化，使用虚拟dom批量插入div元素，减少重绘次数
+
       const div = document.createElement('div')
       div.innerText = i
-      document.body.appendChild(div)
+      fragment.appendChild(div)
+      ul.appendChild(fragment)
+      // document.body.appendChild(div)
     }
     browserPerformChunk(100000, taskHandler)
   }

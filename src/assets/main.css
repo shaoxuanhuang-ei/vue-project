@@ -33,3 +33,20 @@ a,
     padding: 0 2rem;
   }
 }
+/* .line-box {
+  display: flex;
+} */
+.line {
+  margin: auto;
+  width: 300px;
+  font-size: 20px;
+}
+.line span {
+  background: linear-gradient(to right, #d69a9a, #615461) no-repeat right bottom;
+  background-size: 0 2px;
+  transition: background-size 1300ms;
+}
+.line span:hover {
+  background-position-x: left;
+  background-size: 100% 2px;
+}
